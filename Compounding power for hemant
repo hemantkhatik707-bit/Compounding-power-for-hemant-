@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily % Interest Calculator</title>
+    <style>
+        :root { --primary: #2563eb; --accent: #059669; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f1f5f9; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 1.5rem; }
+        
+        .input-box { margin-bottom: 15px; }
+        label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #475569; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; transition: 0.3s; box-sizing: border-box; }
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+
+        button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #1d4ed8; }
+
+        .result-card { margin-top: 20px; padding: 15px; background: #f8fafc; border-left: 4px solid var(--accent); border-radius: 6px; display: none; }
+        .result-card p { margin: 5px 0; font-size: 15px; display: flex; justify-content: space-between; }
+        
+        .scroll-area { max-height: 350px; overflow-y: auto; margin-top: 20px; border: 1px solid #e2e8f0; border-radius: 8px; display: none; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { position: sticky; top: 0; background: #f1f5f9; padding: 10px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
+        .profit { color: var(--accent); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Daily % Byaj Calculator</h2>
+    
+    <div class="input-box">
+        <label>Principal Amount (₹)</label>
+        <input type="number" id="p" placeholder="Jaise: 1000" step="any">
+    </div>
+
+    <div class="input-box">
+        <label>Daily Interest Rate (%)</label>
+        <input type="number" id="r" placeholder="Jaise: 1% ya 2%" step="any">
+    </div>
+
+    <div class="input-box">
+        <label>Time Period (Select Unit)</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="number" id="t" placeholder="Quantity" style="flex: 2;">
+            <select id="unit" style="flex: 1;">
+                <option value="1">Days</option>
+                <option value="30">Months</option>
+                <option value="365">Years</option>
+            </select>
+        </div>
+    </div>
+
+    <button onclick="calculateDaily()">Hisaab Lagao</button>
+
+    <div class="result-card" id="summary">
+        <p>Aapka Paisa: <b id="finalAmt"></b></p>
+        <p>Kul Munafa: <b id="totalProfit" style="color:var(--accent)"></b></p>
+    </div>
+
+    <div class="scroll-area" id="tableCont">
+        <table>
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Interest</th>
+                    <th>Total Balance</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function calculateDaily() {
+    const P_initial = parseFloat(document.getElementById('p').value);
+    const dailyRate = parseFloat(document.getElementById('r').value) / 100;
+    const timeValue = parseInt(document.getElementById('t').value);
+    const multiplier = parseInt(document.getElementById('unit').value);
+    
+    const totalDays = timeValue * multiplier;
+
+    if (isNaN(P_initial) || isNaN(dailyRate) || isNaN(totalDays)) {
+        alert("Kripya sahi number bhariye!");
+        return;
+    }
+
+    let currentP = P_initial;
+    let tableData = "";
+
+    for (let day = 1; day <= totalDays; day++) {
+        let dailyInterest = currentP * dailyRate;
+        currentP += dailyInterest;
+
+        // Har din ka data table mein add karein
+        tableData += `<tr>
+            <td>Day ${day}</td>
+            <td class="profit">+₹${dailyInterest.toFixed(2)}</td>
+            <td><strong>₹${currentP.toFixed(2)}</strong></td>
+        </tr>`;
+    }
+
+    // Results dikhayiye
+    document.getElementById('finalAmt').innerText = "₹" + currentP.toLocaleString('en-IN', {maximumFractionDigits: 2});
+    document.getElementById('totalProfit').innerText = "₹" + (currentP - P_initial).toLocaleString('en-IN', {maximumFractionDigits: 2});
+    
+    document.getElementById('tableBody').innerHTML = tableHtml = tableData;
+    document.getElementById('summary').style.display = "block";
+    document.getElementById('tableCont').style.display = "block";
+}
+</script>
+
+</body>
+</html>
